@@ -13,6 +13,8 @@ class ServiceController extends Controller
     public function index()
     {
         //
+        $servicies = Service::all();
+        return response()->json(['data' => $servicies, 'message' => 'Servicios listados correctamente'], status: 200);
     }
 
     /**
@@ -61,5 +63,21 @@ class ServiceController extends Controller
     public function destroy(Service $service)
     {
         //
+    }
+
+    public function clients(){
+
+        $servicios=Service::all();
+        $serviciosConClientes=[];
+        foreach($servicios as $servicio){
+            $serviciosConClientes[]=[
+                'servicio'=>$servicio,
+                'clientes'=>$servicio->clients
+            ];
+        }
+
+        return response()->json(['data'=>$serviciosConClientes,'message'=>'Servicios con clientes listados correctamente'],200);
+
+
     }
 }

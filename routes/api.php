@@ -3,6 +3,8 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ClienteController;
+use App\Http\Controllers\ServiceController;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -27,4 +29,14 @@ Route::get('/clientes/{id}',[ClienteController::class,'show']);
 //actualizar cliente
 Route::put('/clientes/{id}',[ClienteController::class,'update']);
 //eliminar cliente
-Route::delete('/clientes/{id}',[ClienteController::class,'destroy']);
+Route::delete('/clientes',[ClienteController::class,'destroy']);
+// agregar servicio a cliente
+Route::post('/clientes/agregarServicio',[ClienteController::class,'attachService']);
+// quitar servicio a cliente
+Route::post('/clientes/quitarServicio',[ClienteController::class,'detachhService']);
+
+
+//listar servicios
+Route::get('/servicios/clientes',[ServiceController::class,'clients']);
+
+

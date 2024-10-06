@@ -12,12 +12,22 @@ class ClienteController extends Controller
      */
     public function index()
     {
-        //
+        //todos los clientes
         $clients = Cliente::all();
+        $clientesWithData = [];
+        //defino un arreglo vacio, que voy llenando con un objeto personalidado $clientesWithData
 
+        //$clients->makeHidden('services');
+        foreach ($clients as $client) {
+            $clientesWithData[] = [
+                'cliente' => $client,
+                'servicios' => $client->services
+            ];
+        }
 
-        return response()->json(data: $clients, status: 200);
+        return response()->json(['data' => $clientesWithData, 'message' => 'Clientes listados correctamente'], 200);
     }
+
 
     /**
      * Show the form for creating a new resource.
@@ -34,22 +44,23 @@ class ClienteController extends Controller
     {
         // se utiliza para guardar
 
-        //creo cliente vacio
+        // creo cliente vacio
         $nuevoCliente = new Cliente();
-        //asigno los valores ingresados al cliente
+        // asigno los valores ingresados al cliente
         $nuevoCliente->name = $request->name;
         $nuevoCliente->email = $request->email;
         $nuevoCliente->phone = $request->phone;
         $nuevoCliente->address = $request->address;
-        //guardo el nuevo cliente cargado
+        // guardo el nuevo cliente cargado
         $nuevoCliente->save();
 
         $data = [
             'message' => 'Cliente creado correctamente',
             'cliente' => $nuevoCliente
         ];
-        return response()->json(data: $data, status: 201);
+        return response()->json($data, 201);
     }
+
 
     /**
      * Display the specified resource.
@@ -57,12 +68,22 @@ class ClienteController extends Controller
     public function show($id)
     {
         $cliente = Cliente::find($id);
-        if(!$cliente){
-            return response()->json(data: ['message' => 'Cliente no encontrado'], status: 404);
-
+        if (!$cliente) {
+            return response()->json(['message' => 'Cliente no encontrado'], 404);
         }
-        return response()->json(data: $cliente, status: 200);
+        //obtengo los servicios del cliente
+        $servicios = $cliente->services;
+        //oculto los servicios del cliente Pero se muestran por fuera del objeto cliente
+        //$cliente->makeHidden('services');
+        //RECORDATORIO: automaticamente el cliente obtiene los servicios asociados a el, por la relacion definida en el modelo
+        // al convertir el objeto Cliente a json, se obtiene los servicios, y estos se incluyen dentro del objeto.
 
+        $data = [
+            'message' => 'Detalles cliente',
+            'cliente' => $cliente,
+            'servicios' => $servicios
+        ];
+        return response()->json($data, 200);
     }
 
     /**
@@ -76,8 +97,9 @@ class ClienteController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Cliente $cliente)
+    public function update(Request $request, $id)
     {
+        $cliente = Cliente::find($id);
         // $request valores ingresados por el usuario
         //actualizo los valors utilizando eloquent
         $cliente->phone = $request->phone;
@@ -96,16 +118,54 @@ class ClienteController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Cliente $cliente)
+    public function destroy(Request $request)
     {
         //elimino el cliente
-        $clienteTemp = $cliente;
+        $cliente=$request->client_id;
+        $cliente = Cliente::find($cliente);
         $cliente->delete();
 
         $data = [
             'message' => 'Cliente eliminado correctamente',
-            'cliente' => $clienteTemp
+            'cliente' => $cliente
         ];
         return response()->json(data: $data, status: 200);
     }
+
+    public function attachService(Request $request)
+    {
+        //attachService, a un cliente le agrega un servicio,
+        // id_cliente y id_servicios vienen en el Request.
+        $idCliente = $request->client_id;
+        $idServicio = $request->service_id;
+        //dd($idCliente, $idServicio);
+        $cliente = Cliente::find($idCliente);
+        $cliente->services()->attach($idServicio);
+        $data = [
+            'message' => 'Servicio asignado correctamente',
+            'cliente' => $cliente,
+            'servicie' => $idServicio
+        ];
+        return response()->json(data: $data, status: 200);
+    }
+
+    public function detachhService(Request $request)
+    {
+        //attachService, a un cliente le quito  un servicio,
+        // id_cliente y id_servicios vienen en el Request.
+        $idCliente = $request->client_id;
+        $idServicio = $request->service_id;
+        //dd($idCliente, $idServicio);
+        $cliente = Cliente::find($idCliente);
+        $cliente->services()->detach($idServicio);
+        $data = [
+            'message' => 'Servicio eliminado correctamente',
+            'cliente' => $cliente,
+            'servicie' => $idServicio
+        ];
+        return response()->json(data: $data, status: 200);
+    }
+
+
+
 }
