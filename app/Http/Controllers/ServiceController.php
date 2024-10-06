@@ -12,9 +12,8 @@ class ServiceController extends Controller
      */
     public function index()
     {
-        //
         $servicies = Service::all();
-        return response()->json(['data' => $servicies, 'message' => 'Servicios listados correctamente'], status: 200);
+        return response()->json(['data' => $servicies, 'message' => 'Servicios listados correctamente'], 200);
     }
 
     /**
@@ -30,15 +29,28 @@ class ServiceController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        // Crear una nueva instancia del modelo Service
+        $service = new Service();
+
+        // Asignar los valores del request a los atributos del modelo
+        $service->price = $request->price;
+        $service->name = $request->name;
+        $service->description = $request->description;
+
+        // Guardar el nuevo servicio en la base de datos
+        $service->save();
+
+        // Devolver una respuesta JSON con los datos del servicio creado y un mensaje de éxito
+        return response()->json(['data' => $service, 'message' => 'Servicio creado correctamente'], 201);
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(Service $service)
+    public function show($id)
     {
-        //
+        $servicio = Service::find($id);
+        return response()->json(['data' => $servicio, 'message' => 'Servicio listado correctamente'], 200);
     }
 
     /**
@@ -52,32 +64,35 @@ class ServiceController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Service $service)
+    public function update(Request $request, $id)
     {
-        //
+        $service = Service::find($id);
+        $service->price = $request->price;
+        $service->save();
+        return response()->json(['data' => $service, 'message' => 'Servicio actualizado correctamente'], 200);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Service $service)
+    public function destroy($id)
     {
-        //
+        $service = Service::find($id);
+        $service->delete();
+        return response()->json(['message' => 'Servicio eliminado correctamente'], 200);
     }
 
-    public function clients(){
-
-        $servicios=Service::all();
-        $serviciosConClientes=[];
-        foreach($servicios as $servicio){
-            $serviciosConClientes[]=[
-                'servicio'=>$servicio,
-                'clientes'=>$servicio->clients
+    public function clients()
+    {
+        $servicios = Service::all();
+        $serviciosConClientes = [];
+        foreach ($servicios as $servicio) {
+            $serviciosConClientes[] = [
+                'servicio' => $servicio,
+                'clientes' => $servicio->clients
             ];
         }
 
-        return response()->json(['data'=>$serviciosConClientes,'message'=>'Servicios con clientes listados correctamente'],200);
-
-
+        return response()->json(['data' => $serviciosConClientes, 'message' => 'Servicios con clientes listados correctamente'], 200);
     }
 }

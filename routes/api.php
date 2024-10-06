@@ -36,7 +36,13 @@ Route::post('/clientes/agregarServicio',[ClienteController::class,'attachService
 Route::post('/clientes/quitarServicio',[ClienteController::class,'detachhService']);
 
 
-//listar servicios
+// Listar todos los servicios en el sistema
+Route::get('/servicios',[ServiceController::class,'index']);
+//listar servicios con clientes
 Route::get('/servicios/clientes',[ServiceController::class,'clients']);
+Route::get('/servicios/{id}',[ServiceController::class,'show']);
+Route::delete('/servicios',[ServiceController::class,'destroy']);
+Route::put('/servicios/{id}',[ServiceController::class,'update']);
+Route::post('/servicios',[ServiceController::class,'store']);
 
 
