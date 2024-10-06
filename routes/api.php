@@ -29,7 +29,7 @@ Route::get('/clientes/{id}',[ClienteController::class,'show']);
 //actualizar cliente
 Route::put('/clientes/{id}',[ClienteController::class,'update']);
 //eliminar cliente
-Route::delete('/clientes',[ClienteController::class,'destroy']);
+Route::delete('/clientes/{id}',[ClienteController::class,'destroy']);
 // agregar servicio a cliente
 Route::post('/clientes/agregarServicio',[ClienteController::class,'attachService']);
 // quitar servicio a cliente
